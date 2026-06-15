@@ -43,7 +43,7 @@
 
 ```bash
 pip install -r requirements.txt
-python 01-get-started/02_quickstart.py
+python 01-get-started/1.2_quickstart.py
 ```
 
 ## 环境要求
@@ -55,7 +55,7 @@ python 01-get-started/02_quickstart.py
 
 | 路径 | 适合人群 | 时长 |
 |------|---------|------|
-| `01-get-started/02_quickstart.py` | 首次接触 | 30s |
+| `01-get-started/1.2_quickstart.py` | 首次接触 | 30s |
 | `04-advanced-usage/01_runtime.py` | 核心概念 | 30s |
 | `04-advanced-usage/04-mcp/01_overview.py` | MCP 协议 | 1min |
 | `04-advanced-usage/06-multi-agent/02_subagents.py` | 多智能体 | 2min |
