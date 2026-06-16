@@ -1,31 +1,44 @@
 #!/usr/bin/env python3
-from langgraph.prebuilt import create_react_agent
+"""LangChain 智能体 - 流式天气查询"""
+
+from langchain.agents import create_agent
 from langchain.tools import tool
 from langchain_openai import ChatOpenAI
 
+
 @tool
 def get_weather(city: str) -> str:
-    """获取天气"""
+    """获取指定城市的天气信息"""
     return f"{city} 天气晴朗"
+
 
 llm = ChatOpenAI(
     model="deepseek-chat",
-    api_key="sk-dac290dd70064370ac10057fdcee7f08",
-    base_url="https://api.deepseek.com",
-    temperature=0
+    api_key="sk-xxx",
+    base_url="https://api.deepseek.com"
 )
 
-# 使用 create_react_agent 替代 create_agent
-agent = create_react_agent(model=llm, tools=[get_weather])
+agent = create_agent(
+    llm=llm,
+    tools=[get_weather],
+    system_prompt="You are a helpful assistant",
+)
 
-# 流式输出（打字机效果）
-for chunk in agent.stream(
-    {"messages": [("user", "北京天气如何？")]},
-    stream_mode="messages"
-):
-    # 每个 chunk 是 (message, metadata) 元组
-    if isinstance(chunk, tuple) and len(chunk) == 2:
-        msg, _ = chunk
-        if hasattr(msg, "content") and msg.content:
+# ✅ 正确的流式事件接口
+events = agent.stream(
+    {"messages": [{"role": "user", "content": "北京天气如何？"}]}
+)
+
+# ✅ 逐事件处理（真正 streaming）
+for event in events:
+    # 每个 event 结构可能不同，这里做兼容处理
+    if "messages" in event:
+        msg = event["messages"][-1]
+
+        if hasattr(msg, "content"):
             print(msg.content, end="", flush=True)
+
+        elif isinstance(msg, dict) and "content" in msg:
+            print(msg["content"], end="", flush=True)
+
 print()

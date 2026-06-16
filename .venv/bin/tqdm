@@ -1,4 +1,4 @@
-#!/Users/tianyixun/Downloads/hh-main/.venv/bin/python3
+#!/Users/tianyixun/Downloads/langchain-demo/.venv/bin/python3.14
 import sys
 from tqdm.cli import main
 if __name__ == '__main__':
