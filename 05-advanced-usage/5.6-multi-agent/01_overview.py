@@ -1,55 +1,51 @@
 #!/usr/bin/env python3
-"""Multi-agent Systems — Overview of All 5 Patterns"""
+"""多智能体系统 —— 五种模式总览"""
 
 print("""
 ============================================
-Multi-agent Systems — Overview
+多智能体系统 —— 总览
 ============================================
 
-Multi-agent systems coordinate specialized components to tackle complex
-workflows. However, not every complex task requires this approach — a
-single agent with the right tools and prompt can often achieve similar
-results.
+多智能体系统通过协调多个“专业化组件”来处理复杂任务流程。
+但要注意：并不是所有复杂任务都必须使用多智能体架构——
+很多情况下，一个设计良好的单智能体 + 工具 + 提示词也可以完成类似效果。
 
 为什么需要多智能体？
 ----------------
-  • Context Management: Provide specialized knowledge without
-    overwhelming the model's context window.
-  • Distributed Development: Different teams develop and maintain
-    capabilities independently.
-  • Parallelization: Spawn specialized workers for subtasks and
-    execute them concurrently.
+  • 上下文管理（Context Management）：
+    提供专业知识能力，而不会占满模型的上下文窗口。
 
-For built-in multi-agent support, use Deep Agents — a higher-level
-harness built on LangChain with subagents, skills, planning, a
-virtual filesystem, and context management.
+  • 分布式开发（Distributed Development）：
+    不同团队可以独立开发和维护不同能力模块。
 
-The 5 Patterns
+  • 并行处理（Parallelization）：
+    可以启动多个专门的子任务执行器，同时并行处理子任务。
+
+对于内置多智能体支持，可以使用 Deep Agents：
+这是一个基于 LangChain 构建的更高层框架，包含子代理（subagents）、
+技能系统（skills）、任务规划（planning）、虚拟文件系统以及上下文管理能力。
+
+五种设计模式
 --------------
 
-Pattern        | How It Works                          | Best For
----------------|---------------------------------------|--------------------------
-1. Subagents   | Main agent coordinates subagents      | Distributed development,
-               | as tools. All routing passes through  | parallel execution,
-               | the main agent.                       | multi-hop reasoning
-               |                                       |
-2. Handoffs    | Behavior changes dynamically via      | Sequential specialized
-               | tool calls updating state. Agents     | processing, direct user
-               | transfer control to each other.       | interaction
-               |                                       |
-3. Skills      | Specialized prompts and knowledge     | Single-agent stays in
-               | loaded on-demand. A single agent      | control, context
-               | stays in control.                     | management
-               |                                       |
-4. Router      | A routing step classifies input and   | Input classification,
-               | directs to specialized agents.        | dispatch patterns
-               | Results are synthesized.              |
-               |                                       |
-5. Custom      | Build bespoke execution flows with   | Complex deterministic +
-Workflow       | LangGraph. Mix deterministic logic   | agentic workflows
-               | and agentic behavior.                |
+模式           | 工作方式                              | 适用场景
+--------------|-------------------------------------|--------------------------
+1. 子代理      | 主代理负责协调多个子代理作为工具使用      | 分布式开发、并行任务、
+              | 所有路由都通过主代理完成                | 多跳推理问题
+              |
+2. 任务转交    | 通过工具调用动态切换行为和状态           | 顺序化专业流程处理、
+              | 不同代理之间可以相互接管任务            | 直接用户交互流程
+              |
+3. 技能系统    | 按需加载专用提示词和知识模块             | 单代理模式下的能力扩展、
+              | 由单一代理统一控制                      | 上下文管理优化
+              |
+4. 路由器模式  | 先进行输入分类，再分发到不同专用代理      | 输入分类任务、
+              | 最后统一结果整合                       | 请求分发架构
+              |
+5. 自定义工作流 | 使用 LangGraph 构建完全自定义流程        | 复杂确定性 + 智能体混合
+              | 结合规则流程与智能行为                  | 企业级工作流
 
-Run the individual pattern demos:
+运行各个模式示例：
   python 02_subagents.py
   python 03_handoffs.py
   python 04_skills.py

@@ -4,7 +4,7 @@
 from langgraph.store.memory import InMemoryStore
 from langchain.agents import create_agent
 from langchain.tools import tool
-from langchain.agents.runtime import ToolRuntime
+from langchain.tools import ToolRuntime
 from langchain_openai import ChatOpenAI
 
 llm = ChatOpenAI(
