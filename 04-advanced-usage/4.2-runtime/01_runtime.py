@@ -1,10 +1,15 @@
+#前面的 Tool 都是独立函数,函数只能接收参数。
+#但是在真实项目中，Tool 往往需要访问：数据库连接用户信息API Client配置文件
+#如果不使用runtime，Tool 就无法访问这些外部资源（除非全局变量），导致代码耦合度高、难以测试和维护。
+#所以 LangChain 提供了：runtime.context来实现依赖注入
+
 #!/usr/bin/env python3
 """运行时系统 — 依赖注入（演示 runtime.context）"""
 
 # ---------- 导入 ----------
-from langchain.agents import create_agent          # 创建 Agent
-from langchain.tools import tool, ToolRuntime     # tool 装饰器 + ToolRuntime 类型
-from langchain_openai import ChatOpenAI           # 你的 DeepSeek 配置
+from langchain.agents import create_agent 
+from langchain.tools import tool, ToolRuntime #Tool 的运行时环境对象
+from langchain_openai import ChatOpenAI
 
 
 # ---------- 模拟数据库类 ----------
@@ -12,7 +17,7 @@ class FakeDB:
     """一个假的数据库，仅用于演示"""
     def query(self, sql: str) -> str:
         return f"Executed: {sql}"
-
+#不用mysql,模拟数据库对象,演示数据库对象如何被注入到 Tool 里面
 
 # ---------- 工具定义 ----------
 @tool
@@ -40,7 +45,7 @@ llm = ChatOpenAI(
 
 # ---------- 创建 Agent ----------
 agent = create_agent(
-    llm=llm,
+    model=llm,
     tools=[get_user_data],
     system_prompt="你是一个数据助手，使用 get_user_data 工具查询用户信息。",
     # 注意：这里没有指定 context_schema，默认接受任意字典

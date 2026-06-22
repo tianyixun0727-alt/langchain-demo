@@ -19,7 +19,7 @@ llm = ChatOpenAI(
 )
 
 agent = create_agent(
-    llm=llm,
+    model=llm,
     tools=[get_weather],
     system_prompt="You are a helpful assistant",
 )

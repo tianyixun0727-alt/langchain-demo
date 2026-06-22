@@ -23,15 +23,15 @@ def get_weather(city: str) -> str:
 # ---------- 2. 配置 LLM ----------
 llm = ChatOpenAI(
     model="deepseek-chat",
-    api_key="sk-dac290dd70064370ac10057fdcee7f08",
+    api_key="sk-你的真实API_KEY",   # ⚠️ 请替换为你的真实 Key
     base_url="https://api.deepseek.com",
     temperature=0,
 )
 
-# ---------- 3. 创建 HITL 中间件 ----------当 AI 想调用 send_email 这个工具时，系统不会直接执行，而是先暂停，让人来审批
+# ---------- 3. 创建 HITL 中间件 ----------
 hitl = HumanInTheLoopMiddleware(
     interrupt_on={
-        "send_email": {  # 只对 send_email 启用审批
+        "send_email": {
             "allowed_decisions": ["approve", "edit", "reject"],
             "description": "⚠️ 即将发送邮件，请审批"
         }
@@ -62,8 +62,8 @@ if "__interrupt__" in result:
     print(f"待审批工具: {interrupt}")
 
     # ---------- 7. 模拟人工决策 ----------
-    # 场景1：批准
-    # decision = {"decisions": [{"type": "approve"}]}
+    # 场景1：批准（✅ 当前启用）
+    decision = {"decisions": [{"type": "approve"}]}
 
     # 场景2：编辑（修改内容）
     # decision = {
@@ -76,13 +76,13 @@ if "__interrupt__" in result:
     #     }]
     # }
 
-    # 场景3：拒绝
-    decision = {
-        "decisions": [{
-            "type": "reject",
-            "reason": "邮件内容需要补充更多信息"
-        }]
-    }
+    # 场景3：拒绝（已注释）
+    # decision = {
+    #     "decisions": [{
+    #         "type": "reject",
+    #         "reason": "邮件内容需要补充更多信息"
+    #     }]
+    # }
 
     print(f"\n👤 人工决策: {decision}")
     result = agent.invoke(Command(resume=decision), config=config)

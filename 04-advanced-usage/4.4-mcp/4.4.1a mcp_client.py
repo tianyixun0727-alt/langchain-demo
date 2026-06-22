@@ -3,7 +3,7 @@
 #安装依赖: pip install langchain-mcp-adapters fastmcp
 
 import asyncio
-from langchain_mcp_adapters.client import MultiServerMCPClient
+from langchain_mcp_adapters.client import MultiServerMCPClient# 导入 MultiServerMCPClient 类
 from langchain.agents import create_agent
 from langchain_openai import ChatOpenAI
 

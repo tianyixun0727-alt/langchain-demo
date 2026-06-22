@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 """LangChain Messages 类型示例（tuple写法 + Message类导入）"""
-
+#LangChain 如何用统一的 Messages 结构来描述“人 + AI + 工具”的对话系统
 from langchain.chat_models import init_chat_model
-
-# Message类导入（官方标准方式）
+# Message类导入
 from langchain_core.messages import (
-    SystemMessage,
-    HumanMessage,
-    AIMessage,
-    ToolMessage
+    SystemMessage,#控制ai行为,进行角色设定
+    HumanMessage,#用户输入
+    AIMessage,#模型输出
+    ToolMessage#函数是调用结果,工具返回
 )
 
 # 初始化模型
@@ -82,6 +81,8 @@ messages_obj = [
     AIMessage(content="我正在查询天气信息"),
     ToolMessage(content="北京天气：22°C，多云", tool_call_id="demo")
 ]
+#这一段展示的是标准 LangChain Message 类写法：
+#相比 tuple：✔ 更结构化✔ 更安全✔ 更适合复杂 Agent
 
 response5 = llm.invoke(messages_obj)
 

@@ -1,6 +1,8 @@
-#!/usr/bin/env python3
+#中间件（Middleware）的作用是在不修改 Agent 核心代码的情况下
+# 在 Agent 执行流程的某些阶段插入额外逻辑，对模型调用过程进行增强和控制。
+# !/usr/bin/env python3
 """预置中间件示例：自动摘要（SummarizationMiddleware）"""
-
+#当对话越来越长，LLM 上下文会爆掉（token 超限）,自动把“长对话压缩成摘要”，避免上下文无限增长
 from langchain.agents import create_agent
 from langchain.agents.middleware import SummarizationMiddleware
 from langchain_openai import ChatOpenAI
@@ -12,15 +14,14 @@ llm = ChatOpenAI(
     base_url="https://api.deepseek.com"
 )
 
-# ✅ 修复后的 middleware（新版 API）
 summarizer = SummarizationMiddleware(
     model=llm,
-    max_tokens=400,        # 替代 trigger=("tokens", 400)
-    keep_last=200          # 替代 keep=200
+    max_tokens=400,# 摘要的最大 token 数
+    keep_last=200  # 保留最近的消息数，避免丢失重要上下文
 )
 
 agent = create_agent(
-    llm=llm,
+    model=llm,
     tools=[],
     middleware=[
         summarizer
@@ -36,7 +37,7 @@ long_chat = [
     "上个月我去了一趟云南旅游，大理和丽江都去了。",
 ]
 
-for msg in long_chat:
+for msg in long_chat:#循环调用 Agent
     result = agent.invoke({
         "messages": [{"role": "user", "content": msg}]
     })

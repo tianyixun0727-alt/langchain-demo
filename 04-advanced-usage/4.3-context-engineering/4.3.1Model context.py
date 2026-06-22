@@ -2,8 +2,8 @@
 """上下文工程 Demo 1: 模型上下文 - 动态系统提示词"""
 
 from langchain.agents import create_agent
-from langchain.agents.middleware import dynamic_prompt
-from langchain.agents.middleware.types import ModelRequest
+from langchain.agents.middleware import dynamic_prompt #引入动态提示词中间件
+from langchain.agents.middleware.types import ModelRequest 
 from langchain_openai import ChatOpenAI
 
 

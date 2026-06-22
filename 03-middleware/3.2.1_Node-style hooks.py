@@ -2,11 +2,11 @@
 """自定义中间件示例：节点式钩子（日志记录）"""
 
 from langchain.agents import create_agent
-from langchain.agents.middleware import before_model, after_model
-from langchain.agents.middleware.types import AgentState, Runtime
+from langchain.agents.middleware import before_model, after_model# 导入节点式钩子装饰器
+from langchain.agents.middleware.types import AgentState, Runtime# 导入 AgentState (当前 Agent 的“状态)和 Runtime 类型(当前执行环境)
 from langchain.tools import tool
 from langchain_openai import ChatOpenAI
-from typing import Any, Optional
+from typing import Any, Optional # 导入 Any 和 Optional 类型，用于类型注解
 
 
 # ---------- 工具定义 ----------
@@ -17,16 +17,16 @@ def get_weather(city: str) -> str:
 
 
 # ---------- 节点式钩子 ----------
-@before_model
-def log_before_model(state: AgentState, runtime: Runtime) -> Optional[dict[str, Any]]:
+@before_model# 装饰器，表示这是一个在模型调用前执行的钩子函数
+def log_before_model(state: AgentState, runtime: Runtime) -> Optional[dict[str, Any]]:# 定义一个函数，接受 AgentState 和 Runtime 作为参数，返回一个可选的字典（如果需要修改状态）
     """在每次模型调用前执行"""
-    msg_count = len(state.get("messages", []))
+    msg_count = len(state.get("messages", []))#统计当前对话轮数
     print(f"[BEFORE MODEL] 即将调用模型，当前消息数: {msg_count}")
     # 返回 None 表示不修改状态
     return None
 
 
-@after_model
+@after_model# 装饰器，表示这是一个在模型调用后执行的钩子函数
 def log_after_model(state: AgentState, runtime: Runtime) -> Optional[dict[str, Any]]:
     """在每次模型响应后执行"""
     last_msg = state["messages"][-1]
@@ -35,7 +35,7 @@ def log_after_model(state: AgentState, runtime: Runtime) -> Optional[dict[str, A
     print(f"[AFTER MODEL] 回复预览: {content[:50]}...")
     # 返回 None 表示不修改状态
     return None
-
+#在模型输出之后，可以对结果做分析、日志或监控
 
 # ---------- 初始化模型和 Agent ----------
 llm = ChatOpenAI(
@@ -46,7 +46,7 @@ llm = ChatOpenAI(
 )
 
 agent = create_agent(
-    llm=llm,
+    model=llm,
     tools=[get_weather],
     system_prompt="你是一个有帮助的天气助手。",
     middleware=[

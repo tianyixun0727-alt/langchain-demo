@@ -2,7 +2,7 @@
 """Guardrails Demo: PII 脱敏"""
 
 from langchain.agents import create_agent
-from langchain.agents.middleware import PIIMiddleware
+from langchain.agents.middleware import PIIMiddleware#引入一个“隐私过滤中间件”
 from langchain_openai import ChatOpenAI
 
 llm = ChatOpenAI(

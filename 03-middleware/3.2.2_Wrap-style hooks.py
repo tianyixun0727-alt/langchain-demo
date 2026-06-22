@@ -4,8 +4,8 @@
 import time
 from typing import Callable
 from langchain.agents import create_agent
-from langchain.agents.middleware import wrap_model_call
-from langchain.agents.middleware.types import ModelRequest, ModelResponse
+from langchain.agents.middleware import wrap_model_call # 导入包装式钩子装饰器
+from langchain.agents.middleware.types import ModelRequest, ModelResponse # 导入 ModelRequest 和 ModelResponse 类型，用于类型注解
 from langchain.tools import tool
 from langchain_openai import ChatOpenAI
 
@@ -38,7 +38,7 @@ def retry_with_backoff(
             if attempt == max_attempts - 1:
                 print(f"❌ 重试 {max_attempts} 次均失败，最后错误: {e}")
                 raise
-            # 计算退避时间：1s, 2s, 4s, ...
+            # 计算退避时间：1s, 2s, 4s, ...防止疯狂请求服务器,给服务器恢复时间
             delay = base_delay * (2 ** attempt)
             print(f"⚠️ 模型调用失败 (尝试 {attempt + 1}/{max_attempts})，{delay}s 后重试... 错误: {e}")
             time.sleep(delay)
@@ -55,7 +55,7 @@ llm = ChatOpenAI(
 )
 
 agent = create_agent(
-    llm=llm,
+    model=llm,
     tools=[get_weather],
     system_prompt="你是一个有用的天气助手。",
     middleware=[
@@ -72,3 +72,9 @@ if __name__ == "__main__":
     })
     print("\n=== 最终回答 ===")
     print(result["messages"][-1].content)
+
+
+#节点式钩子（Node Hook）和包装式钩子（Wrapper Hook）的最大区别在于控制范围不同。
+# 节点式钩子是在某个固定节点前后执行额外逻辑，比如 before_model 和 after_model，通常用于日志记录、监控和状态修改；
+# 而包装式钩子会把整个模型调用过程包裹起来，能够拦截并控制整个调用链，因此可以实现自动重试、限流、熔断、模型切换等更高级的功能。
+# 简单来说，节点式钩子是“在流程某个位置插一段代码”，而包装式钩子是“接管整个流程并决定它怎么执行”。

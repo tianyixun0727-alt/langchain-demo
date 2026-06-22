@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """MCP Demo 5b: 有状态会话客户端"""
-
+#MCP 不仅能提供工具，还能保存会话状态
 import asyncio
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain_mcp_adapters.tools import load_mcp_tools
-#load_mcp_tools 的作用就是：将工具绑定到指定的会话上，让工具执行时使用该会话，而不是每次都新建
+#将工具绑定到指定的会话上，让工具执行时使用该会话，而不是每次都新建
 from langchain.agents import create_agent
 from langchain_openai import ChatOpenAI
 
-async def main():
+async def main():#创建 MCP 客户端，连接本地 stdio 服务器
     client = MultiServerMCPClient({
         "stateful": {
             "transport": "stdio",

@@ -2,11 +2,12 @@
 """短期记忆：智能体记住对话上下文"""
 
 from langgraph.checkpoint.memory import InMemorySaver
+#导入记忆组件,保存每个对话线程的状态,每次调用的时候，都可以把之前的消息重新加载回来
 from langchain.agents import create_agent
 from langchain_openai import ChatOpenAI
 
 
-checkpointer = InMemorySaver()
+checkpointer = InMemorySaver()#创建了一个内存存储器,messages 会被保存在内存中,适合演示和测试,如果要长期保存,可以换成数据库存储器
 llm = ChatOpenAI(
     model="deepseek-chat",
     api_key="sk-dac290dd70064370ac10057fdcee7f08",
@@ -14,7 +15,7 @@ llm = ChatOpenAI(
 )
 
 agent = create_agent(
-    llm=llm,
+    model=llm,
     tools=[],
     checkpointer=checkpointer,
 )
@@ -22,7 +23,7 @@ agent = create_agent(
 # 第一轮
 agent.invoke(
     {"messages": [{"role": "user", "content": "My name is Alice."}]},
-    config={"configurable": {"thread_id": "thread-1"}},
+    config={"configurable": {"thread_id": "thread-1"}},#会话id
 )
 print("Round 1: Told the agent my name.")
 
