@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""MCP Demo 6b: 工具拦截器 - 客户端（日志 + 重试 + 上下文注入）"""
+"""MCP Demo 3a: 工具拦截器 - 客户端（日志 + 重试 + 上下文注入）"""
 #在 AI 调用工具的过程中，加一层“中间处理层”
 
 import asyncio
@@ -15,12 +15,12 @@ from langgraph.types import Command
 @dataclass
 class UserContext:
     user_id: str
-#把 user_id 绑定到整个 Agent 运行过程
+#保存当前用户是谁,把 user_id 绑定到整个 Agent 运行过程
 
 # ---------- 2. 拦截器1：日志（记录 AI 调用了什么工具）----------
 async def logging_interceptor(request: MCPToolCallRequest, handler):
     print(f"[LOG] 调用工具: {request.name}, 参数: {request.args}")
-    result = await handler(request)
+    result = await handler(request)#继续执行,调用工具
     print(f"[LOG] 工具返回: {str(result)[:50]}...")
     return result
 
@@ -74,9 +74,9 @@ async def main():
 
     # 配置 LLM
     llm = ChatOpenAI(
-        model="deepseek-chat",
-        api_key="sk-dac290dd70064370ac10057fdcee7f08",
-        base_url="https://api.deepseek.com",
+        model="deepseek-v3",
+        api_key="NbEJz6UO3LEL9uLngmohSK9iW8M2hNt8ZK5gn7MSq8trEplD",
+        base_url="http://10.187.126.181:3000/v1",
         temperature=0,
     )
 

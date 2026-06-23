@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""MCP Demo 2: 自定义 MCP 服务器（数学工具）"""
+"""MCP Demo 1b: 自定义 MCP 服务器（数学工具）"""
 
 from fastmcp import FastMCP
 

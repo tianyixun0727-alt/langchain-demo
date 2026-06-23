@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""MCP Demo 6a: 工具拦截器 - 服务端"""
+"""MCP Demo 3b: 工具拦截器 - 服务端"""
 
 from fastmcp import FastMCP
 

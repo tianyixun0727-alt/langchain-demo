@@ -33,9 +33,9 @@ def translate_agent(query: str) -> str:
 # =========================================================
 
 llm = ChatOpenAI(
-    model="deepseek-chat",
-    api_key="sk-xxx",
-    base_url="https://api.deepseek.com",
+    model="deepseek-v3",
+    api_key="NbEJz6UO3LEL9uLngmohSK9iW8M2hNt8ZK5gn7MSq8trEplD",
+    base_url="http://10.187.126.181:3000/v1",
     temperature=0,
 )
 

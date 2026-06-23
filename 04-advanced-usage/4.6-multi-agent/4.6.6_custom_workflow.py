@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """自定义工作流 Demo：LangGraph 编排复杂流程"""
 
-from langgraph.graph import StateGraph, END # LangGraph 是一个专门用于构建复杂工作流的库，StateGraph 是其中的核心类
+from langgraph.graph import StateGraph, END 
 from typing import TypedDict
 
 

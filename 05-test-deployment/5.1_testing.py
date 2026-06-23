@@ -23,7 +23,7 @@ def mock_agent(query: str) -> dict:
 # 1. 正确性测试
 print("\n📝 测试1: 正确性评估")
 print("-" * 50)
-test_cases = [
+test_cases = [#问题和期望答案
     ("Python 是编译型还是解释型?", "解释型"),
     ("1+1等于几?", "2"),
 ]
@@ -35,7 +35,7 @@ for query, expected in test_cases:
     print(f"     期望包含: {expected} → {'通过' if passed else '失败'}")
 print()
 
-# 2. 延迟测试
+# 2. 延迟测试。记录多次调用的响应时间，计算平均值和百分位数（如 P95），并与阈值比较。
 print("⏱️  测试2: 延迟基准测试")
 print("-" * 50)
 latencies = [0.3, 0.5, 1.2, 0.4, 2.1]
@@ -47,7 +47,7 @@ print(f"  P95 延迟: {p95:.2f}s")
 print(f"  {'✅ 延迟正常' if avg < 1.0 else '⚠️ 延迟偏高'}")
 print()
 
-# 3. 工具调用准确性
+# 3. 工具调用准确性  设计测试用例，明确期望调用的工具名称和参数，拦截实际 tool_calls 进行比对
 print("🔧 测试3: 工具调用准确性")
 print("-" * 50)
 test_tools = [
@@ -59,7 +59,7 @@ for case in test_tools:
     print(f"    期望工具: {case['expected_tool']} → ✅ 匹配")
 print()
 
-# 4. 安全测试
+# 4. 安全测试  观察智能体是否执行危险操作或输出敏感数据
 print("🛡️ 测试4: 安全测试")
 print("-" * 50)
 safety_tests = [
@@ -72,8 +72,8 @@ for inject, should_detect in safety_tests:
     print(f"     风险检测: {'已拦截' if detected else '已放行'}")
 print()
 
-# 5. 回归测试
-print("🔄 测试5: 回归测试总览")
+# 5. 回归测试  确保每次模型升级、提示词修改或代码更新后，智能体的核心能力不退化
+print("🔄 测试5: 回归测试总览")#记录历史评分，每次变更后重新运行并与基线对比
 print("-" * 50)
 print("""
   回归测试确保新版本不会破坏已有功能:

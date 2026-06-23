@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""MCP Demo 5b: 有状态会话客户端"""
-#MCP 不仅能提供工具，还能保存会话状态
+"""MCP Demo 2a: 有状态会话客"""
+#MCP 不仅能提供工具，还能保存会话状态   
 import asyncio
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain_mcp_adapters.tools import load_mcp_tools
@@ -25,9 +25,9 @@ async def main():#创建 MCP 客户端，连接本地 stdio 服务器
 
         # 配置 LLM
         llm = ChatOpenAI(
-            model="deepseek-chat",
-            api_key="sk-dac290dd70064370ac10057fdcee7f08",
-            base_url="https://api.deepseek.com",
+            model="deepseek-v3",
+            api_key="NbEJz6UO3LEL9uLngmohSK9iW8M2hNt8ZK5gn7MSq8trEplD",
+            base_url="http://10.187.126.181:3000/v1",
             temperature=0,
         )
 

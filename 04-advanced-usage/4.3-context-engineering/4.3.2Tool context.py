@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """上下文工程 Demo 2: 工具上下文 - 读写状态"""
-#但是在真实项目里面，工具往往需要知道更多的信息，例如：当前用户是谁,
+#Tool 不仅能执行任务，还能通过 runtime.state 读写 Agent 的状态，并且配合 checkpointer 实现跨调用记忆。
 from langchain.agents import create_agent
 from langchain.tools import tool, ToolRuntime#Tool 当前运行时环境
 from langchain_openai import ChatOpenAI
@@ -35,9 +35,9 @@ def record_visit(runtime: ToolRuntime) -> Command:
 
 # ---------- 2. 配置 LLM ----------
 llm = ChatOpenAI(
-    model="deepseek-chat",
-    api_key="你的_API_KEY",
-    base_url="https://api.deepseek.com",
+    model="deepseek-v3",
+    api_key="NbEJz6UO3LEL9uLngmohSK9iW8M2hNt8ZK5gn7MSq8trEplD",
+    base_url="http://10.187.126.181:3000/v1",
     temperature=0,
 )
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Subagents Demo：主 Agent 调度多个专家 Agent"""
-
+#把不同能力封装成工具，让主 Agent 自动选择调用
 from langchain.agents import create_agent
 from langchain.tools import tool
 from langchain_openai import ChatOpenAI
@@ -30,9 +30,9 @@ def math_agent(expression: str) -> str:
 # =========================================================
 
 llm = ChatOpenAI(
-    model="deepseek-chat",
-    api_key="sk-xxx",  # 用你自己的 key
-    base_url="https://api.deepseek.com",
+    model="deepseek-v3",
+    api_key="NbEJz6UO3LEL9uLngmohSK9iW8M2hNt8ZK5gn7MSq8trEplD",
+    base_url="http://10.187.126.181:3000/v1",
     temperature=0,
 )
 

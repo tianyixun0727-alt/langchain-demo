@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""MCP Demo 1: 连接 MCP 服务器并使用工具"""
+"""MCP Demo 1a: 连接 MCP 服务器并使用工具"""
 #安装依赖: pip install langchain-mcp-adapters fastmcp
 
 import asyncio
@@ -23,9 +23,9 @@ async def main():
 
     # 3. 配置 LLM（使用 DeepSeek）
     llm = ChatOpenAI(
-        model="deepseek-chat",
-        api_key="sk-dac290dd70064370ac10057fdcee7f08",
-        base_url="https://api.deepseek.com",
+        model="deepseek-v3",
+        api_key="NbEJz6UO3LEL9uLngmohSK9iW8M2hNt8ZK5gn7MSq8trEplD",
+        base_url="http://10.187.126.181:3000/v1",
         temperature=0,
     )
 

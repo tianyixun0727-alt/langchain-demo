@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Retrieval Demo 2: Agentic RAG（Agent 自主决策检索）"""
-
+#将检索能力包装成工具 search_knowledge_base，交给 LangChain Agent，由 LLM 自主判断是否需要检索
 from langchain.agents import create_agent
 from langchain.tools import tool
 from langchain_openai import ChatOpenAI
@@ -37,9 +37,9 @@ def search_knowledge_base(query: str) -> str:
 
 # ---------- 3. 配置 LLM ----------
 llm = ChatOpenAI(
-    model="deepseek-chat",
-    api_key="sk-dac290dd70064370ac10057fdcee7f08",
-    base_url="https://api.deepseek.com",
+    model="deepseek-v3",
+    api_key="NbEJz6UO3LEL9uLngmohSK9iW8M2hNt8ZK5gn7MSq8trEplD",
+    base_url="http://10.187.126.181:3000/v1",
     temperature=0,
 )
 

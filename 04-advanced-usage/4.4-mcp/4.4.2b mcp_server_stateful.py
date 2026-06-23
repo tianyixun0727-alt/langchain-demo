@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""MCP Demo 5a: 有状态会话服务器"""
+"""MCP Demo 2b: 有状态会话服务器"""
 
 from fastmcp import FastMCP, Context
 
