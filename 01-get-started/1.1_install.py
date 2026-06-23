@@ -2,18 +2,9 @@
 """
 LangChain 0.3 + LangGraph 环境检测
 """
-
-# =========================
-# 需要安装的依赖（必须）
-# =========================
-# pip install langchain
-# pip install langchain-openai
-# pip install langchain-core
-# pip install langgraph
-# pip install langchain-community   # （可选扩展）
-# pip install openai
-# pip install tiktoken
-
+#创建虚拟环境：uv venv
+#激活虚拟环境：.\.venv\Scripts\Activate.ps1
+#安装相关包:uv pip install langchain langchain-openai langchain-core langgraph langchain-community openai tiktoken
 
 # =========================
 # 1. LangChain

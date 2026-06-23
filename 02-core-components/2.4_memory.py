@@ -9,9 +9,9 @@ from langchain_openai import ChatOpenAI
 
 checkpointer = InMemorySaver()#创建了一个内存存储器,messages 会被保存在内存中,适合演示和测试,如果要长期保存,可以换成数据库存储器
 llm = ChatOpenAI(
-    model="deepseek-chat",
-    api_key="sk-dac290dd70064370ac10057fdcee7f08",
-    base_url="https://api.deepseek.com"
+    model="deepseek-v3",
+    api_key="NbEJz6UO3LEL9uLngmohSK9iW8M2hNt8ZK5gn7MSq8trEplD",
+    base_url="http://10.187.126.181:3000/v1"
 )
 
 agent = create_agent(

@@ -6,9 +6,9 @@ from langchain.agents.middleware import PIIMiddleware#引入一个“隐私过�
 from langchain_openai import ChatOpenAI
 
 llm = ChatOpenAI(
-    model="deepseek-chat",
-    api_key="sk-dac290dd70064370ac10057fdcee7f08",
-    base_url="https://api.deepseek.com"
+    model="deepseek-v3",
+    api_key="NbEJz6UO3LEL9uLngmohSK9iW8M2hNt8ZK5gn7MSq8trEplD",
+    base_url="http://10.187.126.181:3000/v1"
 )
 
 agent = create_agent(

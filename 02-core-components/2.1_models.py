@@ -7,10 +7,10 @@ from langchain.chat_models import init_chat_model
 
 # 初始化 DeepSeek 模型（兼容 OpenAI API）
 llm = init_chat_model(
-    model="deepseek-chat",
+    model="deepseek-v3",
     model_provider="openai",
-    api_key="你的_API_KEY",
-    base_url="https://api.deepseek.com",
+    api_key="NbEJz6UO3LEL9uLngmohSK9iW8M2hNt8ZK5gn7MSq8trEplD",
+    base_url="http://10.187.126.181:3000/v1",
 )
 
 print("Model: DeepSeek Chat (via OpenAI compatible API)")

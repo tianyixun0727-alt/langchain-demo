@@ -15,9 +15,9 @@ def get_weather(city: str) -> str:
 
 
 llm = ChatOpenAI(
-    model="deepseek-chat",
-    api_key="sk-dac290dd70064370ac10057fdcee7f08",
-    base_url="https://api.deepseek.com"
+    model="deepseek-v3",
+    api_key="NbEJz6UO3LEL9uLngmohSK9iW8M2hNt8ZK5gn7MSq8trEplD",
+    base_url="http://10.187.126.181:3000/v1"
 )#这一部分我们初始化了语言模型 ChatOpenAI。
 #虽然名字是 OpenAI，但其实支持任何兼容 OpenAI API 的模型，比如 DeepSeek。
 
@@ -33,4 +33,4 @@ result = agent.invoke({
         "content": "What's the weather in San Francisco?"
     }]
 })
-print(result["messages"][-1]["content"])
+print(result["messages"][-1].content)

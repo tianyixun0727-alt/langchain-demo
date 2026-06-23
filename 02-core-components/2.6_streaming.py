@@ -5,9 +5,9 @@ from langchain_openai import ChatOpenAI
 from langchain.agents import create_agent
 
 llm = ChatOpenAI(
-    model="deepseek-chat",
-    api_key="sk-dac290dd70064370ac10057fdcee7f08",
-    base_url="https://api.deepseek.com"
+    model="deepseek-v3",
+    api_key="NbEJz6UO3LEL9uLngmohSK9iW8M2hNt8ZK5gn7MSq8trEplD",
+    base_url="http://10.187.126.181:3000/v1"
 )
 
 print("=== Token Streaming ===")
@@ -20,9 +20,12 @@ print("\n")
 print("=== Agent Streaming ===")
 
 
-agent = create_agent(llm=llm, tools=[])
+agent = create_agent(model=llm, tools=[])
+
 for chunk in agent.stream({
     "messages": [{"role": "user", "content": "Say hello!"}]
 }):
     if "messages" in chunk:
         print(chunk["messages"][-1])
+#模型流式输出，是模型边生成边输出。
+#智能体流式输出，是整个智能体执行过程边执行边输出。
