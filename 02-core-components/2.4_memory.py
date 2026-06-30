@@ -22,7 +22,7 @@ agent = create_agent(
 
 # 第一轮
 agent.invoke(
-    {"messages": [{"role": "user", "content": "My name is Alice."}]},
+    {"messages": [{"role": "user", "content": "My name is Eason."}]},
     config={"configurable": {"thread_id": "thread-1"}},#会话id
 )
 print("Round 1: Told the agent my name.")

@@ -173,7 +173,7 @@ def retrieve_documents(query: str, k: int = 3) -> List[Dict[str, Any]]:
     return output
 
 
-# ---------- 4. 定义 Agent 工具 ----------
+# ---------- 4. 定义 agent 工具 ----------
 @tool
 def search_regulations(query: str) -> str:
     """
