@@ -31,7 +31,3 @@ messages = [
 
 reply = llm.invoke(messages)
 print(f"Pirate: {reply.content}")
-
-# invoke vs stream
-# invoke(): 一次性返回完整结果（等待全部生成完）
-# stream(): 流式返回，边生成边输出（适合实时显示）

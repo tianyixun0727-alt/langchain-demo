@@ -32,4 +32,4 @@ result = agent.invoke(
     {"messages": [{"role": "user", "content": "What is my name?"}]},
     config={"configurable": {"thread_id": "thread-1"}},
 )
-print(f"Round 2: {result['messages'][-1]['content']}")
+print(f"Round 2: {result['messages'][-1].content}")

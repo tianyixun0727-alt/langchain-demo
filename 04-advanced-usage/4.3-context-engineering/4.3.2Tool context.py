@@ -1,39 +1,74 @@
 #!/usr/bin/env python3
-"""上下文工程 Demo 2: 工具上下文 - 读写状态"""
-#Tool 不仅能执行任务，还能通过 runtime.state 读写 Agent 的状态，并且配合 checkpointer 实现跨调用记忆。
-from langchain.agents import create_agent
-from langchain.tools import tool, ToolRuntime#Tool 当前运行时环境
-from langchain_openai import ChatOpenAI
+"""上下文工程 Demo 2: 工具上下文 - 购物车管理（读写状态 + 静态配置）"""
+
+import sys, io
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+
+from typing import Annotated, NotRequired, List, Dict, Any
+from langchain_core.tools import tool
+from langchain_core.messages import ToolMessage
+from langchain.tools import ToolRuntime
+from langchain.agents import create_agent, AgentState
 from langgraph.types import Command
-from langgraph.checkpoint.memory import InMemorySaver #短期记忆保存状态
+from langchain_openai import ChatOpenAI
+from langgraph.checkpoint.memory import InMemorySaver
 
 
-# ---------- 1. 定义工具 ----------
+# ---------- 1. 扩展状态模式 ----------
+class CartState(AgentState):
+    cart: NotRequired[List[Dict[str, Any]]]   # 商品列表 [{"name": str, "price": float}]
+    total: NotRequired[float]                 # 原价总额
+
+
+# ---------- 2. 定义工具 ----------
 @tool
-def record_visit(runtime: ToolRuntime) -> Command:
-    """
-    记录访问次数，并更新状态。
-    """
-    # 从 State 中读取访问次数
-    current = runtime.state.get("visit_count", 0)
-    new_count = current + 1
+def add_item(name: str, price: float, runtime: ToolRuntime) -> Command:
+    """添加商品到购物车，并返回当前购物车摘要（含折扣后价格）。"""
+    current_cart = runtime.state.get("cart", [])
+    current_total = runtime.state.get("total", 0.0)
 
-    # 返回状态更新指令
+    new_item = {"name": name, "price": price}
+    updated_cart = current_cart + [new_item]
+    updated_total = current_total + price
+
+    config = runtime.config or {}
+    discount = config.get("configurable", {}).get("discount", 0.0)
+
+    # 构建摘要
+    item_list = ", ".join([f"{i['name']}(¥{i['price']:.1f})" for i in updated_cart])
+    final_price = updated_total * (1 - discount)
+    summary = f"购物车: {item_list} | 原价 ¥{updated_total:.1f}"
+    if discount > 0:
+        summary += f" → 折后 ¥{final_price:.1f} (折扣 {discount*100:.0f}%)"
+    else:
+        summary += f" | 实付 ¥{updated_total:.1f}"
+
     return Command(
         update={
-            "visit_count": new_count,
+            "cart": updated_cart,
+            "total": updated_total,
             "messages": [
-                {
-                    "role": "tool",
-                    "content": f"这是您第 {new_count} 次访问",
-                    "tool_call_id": runtime.tool_call_id,
-                }
+                ToolMessage(content=summary, tool_call_id=runtime.tool_call_id)
             ],
         }
     )
 
 
-# ---------- 2. 配置 LLM ----------
+@tool
+def clear_cart(runtime: ToolRuntime) -> Command:
+    """清空购物车。"""
+    return Command(
+        update={
+            "cart": [],
+            "total": 0.0,
+            "messages": [
+                ToolMessage(content="购物车已清空", tool_call_id=runtime.tool_call_id)
+            ],
+        }
+    )
+
+
+# ---------- 3. 配置 LLM ----------
 llm = ChatOpenAI(
     model="deepseek-v3",
     api_key="NbEJz6UO3LEL9uLngmohSK9iW8M2hNt8ZK5gn7MSq8trEplD",
@@ -42,71 +77,50 @@ llm = ChatOpenAI(
 )
 
 
-# ---------- 3. 创建 Checkpointer ----------
-# 用于保存 Agent 状态
+# ---------- 4. 创建 Checkpointer ----------
 checkpointer = InMemorySaver()
 
 
-# ---------- 4. 创建 Agent ----------
+# ---------- 5. 创建 Agent ----------
 agent = create_agent(
     model=llm,
-    tools=[record_visit],
+    tools=[add_item, clear_cart],
+    state_schema=CartState,
     checkpointer=checkpointer,
 )
 
 
-# ---------- 5. 第一次调用 ----------
+# ---------- 6. 第一次调用 ----------
 result1 = agent.invoke(
-    {
-        "messages": [
-            {"role": "user", "content": "记录访问"}
-        ]
-    },
-    config={
-        "configurable": {
-            "thread_id": "user-1"
-        }
-    }
+    {"messages": [{"role": "user", "content": "添加苹果，价格5.5"}]},
+    config={"configurable": {"thread_id": "user-1"}},
 )
-
 print("第一次调用：")
 print(result1["messages"][-1].content)
 
 
-# ---------- 6. 第二次调用 ----------
+# ---------- 7. 第二次调用（启用10%折扣） ----------
 result2 = agent.invoke(
-    {
-        "messages": [
-            {"role": "user", "content": "再记录一次"}
-        ]
-    },
-    config={
-        "configurable": {
-            "thread_id": "user-1"
-        }
-    }
+    {"messages": [{"role": "user", "content": "添加香蕉，价格3.2"}]},
+    config={"configurable": {"thread_id": "user-1", "discount": 0.1}},
 )
-
 print("第二次调用：")
 print(result2["messages"][-1].content)
 
 
-# ---------- 7. 第三次调用 ----------
+# ---------- 8. 第三次调用 ----------
 result3 = agent.invoke(
-    {
-        "messages": [
-            {"role": "user", "content": "继续记录"}
-        ]
-    },
-    config={
-        "configurable": {
-            "thread_id": "user-1"
-        }
-    }
+    {"messages": [{"role": "user", "content": "添加橙子，价格4.0"}]},
+    config={"configurable": {"thread_id": "user-1", "discount": 0.1}},
 )
-
 print("第三次调用：")
 print(result3["messages"][-1].content)
 
-#Tool 可以通过 runtime.state 读取和修改 Agent 的状态。
-# 如果再配合 checkpointer 和 thread_id，这个状态还能跨多次调用保存下来，实现真正有记忆的 Agent。
+
+# ---------- 9. 清空购物车 ----------
+result4 = agent.invoke(
+    {"messages": [{"role": "user", "content": "清空购物车"}]},
+    config={"configurable": {"thread_id": "user-1", "discount": 0.1}},
+)
+print("清空后：")
+print(result4["messages"][-1].content)

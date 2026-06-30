@@ -1,36 +1,12 @@
 #!/usr/bin/env python3
-"""Retrieval Demo 1: 2-Step RAG（固定检索 + 生成）"""
+"""两步法 RAG（Qdrant 版本，原生 score_threshold 过滤）"""
 
-from langchain_openai import ChatOpenAI
+import os
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_qdrant import Qdrant
+from qdrant_client import QdrantClient
 
-# ---------- 1. 模拟文档库 ----------
-DOCUMENTS = [
-    {"id": "doc1", "content": "LangChain 是一个用于构建 LLM 应用的框架，支持链式调用、工具集成和智能体。"},
-    {"id": "doc2", "content": "RAG（检索增强生成）通过外部知识库检索来增强 LLM 的生成能力，减少幻觉。"},
-    {"id": "doc3", "content": "DeepSeek 是深度求索公司开发的大语言模型，支持多种语言和长上下文。"},
-    {"id": "doc4", "content": "向量存储（如 Chroma、FAISS）用于存储文本的向量表示，实现语义相似性搜索。"},
-]
-
-# ---------- 2. 模拟检索器（基于关键词匹配） ----------
-def retrieve(query: str, top_k: int = 2) -> list[str]:
-    """
-    简单的关键词检索：返回包含查询关键词的前 top_k 个文档。
-    实际生产环境应替换为向量检索（如 Chroma + 嵌入模型）。
-    """
-    results = []
-    for doc in DOCUMENTS:
-        # 检查文档内容是否包含查询中的任何词（简单分词）
-        query_words = set(query.lower().split())
-        doc_words = set(doc["content"].lower().split())
-        # 计算匹配词数
-        match_count = len(query_words & doc_words)
-        if match_count > 0:
-            results.append((doc["content"], match_count))
-    # 按匹配词数降序排序，取前 top_k
-    results.sort(key=lambda x: x[1], reverse=True)
-    return [content for content, _ in results[:top_k]]
-
-# ---------- 3. 配置 LLM ----------
+# ------------------- 1. 初始化模型 -------------------
 llm = ChatOpenAI(
     model="deepseek-v3",
     api_key="NbEJz6UO3LEL9uLngmohSK9iW8M2hNt8ZK5gn7MSq8trEplD",
@@ -38,31 +14,89 @@ llm = ChatOpenAI(
     temperature=0,
 )
 
-# ---------- 4. 2-Step RAG 流程 ----------
-def rag_pipeline(user_query: str) -> str:
-    # Step 1: 检索
-    docs = retrieve(user_query)
-    context = "\n\n".join(docs)
-    print(f"📄 检索到 {len(docs)} 个相关文档片段：")
-    for i, doc in enumerate(docs, 1):
-        print(f"  [{i}] {doc[:60]}...")
-    print()
+embeddings = OpenAIEmbeddings(
+    model="bge-m3",
+    api_key="NbEJz6UO3LEL9uLngmohSK9iW8M2hNt8ZK5gn7MSq8trEplD",
+    base_url="http://10.187.126.181:3000/v1",
+)
 
-    # Step 2: 生成（基于检索结果构建提示词）
-    prompt = f"""基于以下参考信息回答用户问题。如果信息不足，请直接说明。
+# ------------------- 2. 读取知识库 -------------------
+kb_path = os.path.join(os.path.dirname(__file__), "knowledge_base.txt")
+if not os.path.exists(kb_path):
+    raise FileNotFoundError(f"知识库文件不存在: {kb_path}")
 
-参考信息：
-{context if context else "（未找到相关文档）"}
+texts = []
+metadatas = []
+with open(kb_path, "r", encoding="utf-8") as f:
+    for line in f:
+        line = line.strip()
+        if not line:
+            continue
+        parts = line.split("|", 1)
+        if len(parts) == 2:
+            doc_id, content = parts
+            texts.append(content)
+            metadatas.append({"id": doc_id})
 
-用户问题：{user_query}
+print(f"📚 已加载 {len(texts)} 条知识片段")
 
-回答："""
-    response = llm.invoke(prompt)
-    return response.content
+# ------------------- 3. 删除已有 collection（若有） -------------------
+COLLECTION_NAME = "rag_docs_2step"
+client = QdrantClient(host="localhost", port=6333)
+if client.collection_exists(COLLECTION_NAME):
+    client.delete_collection(COLLECTION_NAME)
+    print(f"🗑️  已删除旧 collection: {COLLECTION_NAME}")
 
-# ---------- 5. 测试 ----------
-if __name__ == "__main__":
-    query = "什么是 RAG？"
-    print(f"❓ 用户提问: {query}\n")
-    answer = rag_pipeline(query)
-    print(f"🤖 最终回答:\n{answer}")
+# ------------------- 4. 创建向量库（使用 location 参数） -------------------
+vectorstore = Qdrant.from_texts(
+    texts=texts,
+    embedding=embeddings,
+    metadatas=metadatas,
+    collection_name=COLLECTION_NAME,
+    distance_func="Cosine",
+    location="localhost:6333",  # ✅ 使用 location 让库内部创建客户端
+)
+print(f"✅ 向量库已就绪（Qdrant, collection: {COLLECTION_NAME}）")
+
+# ------------------- 5. 检索函数（使用原生 score_threshold） -------------------
+def retrieve(query, k=5, threshold=0.7):
+    docs_with_score = vectorstore.similarity_search_with_score(
+        query=query,
+        k=k,
+        score_threshold=threshold
+    )
+    results = []
+    for doc, score in docs_with_score:
+        results.append({
+            "id": doc.metadata.get("id", "未知"),
+            "content": doc.page_content,
+            "score": score
+        })
+    return results
+
+# ------------------- 6. 用户问题 -------------------
+user_question = "苹果是一种常见的水果，味道甜美，富含维生素C"
+print(f"\n👤 用户: {user_question}")
+
+retrieved = retrieve(user_question, k=10, threshold=0.5)
+
+if not retrieved:
+    print("❌ 未找到相关文档。")
+    exit()
+
+print("\n📄 检索到的文档:")
+for idx, doc in enumerate(retrieved, 1):
+    preview = doc["content"][:40] + "..." if len(doc["content"]) > 40 else doc["content"]
+    print(f"  {idx}. [ID: {doc['id']}] (相似度: {doc['score']:.3f}) {preview}")
+
+# ------------------- 7. 生成答案 -------------------
+context = "\n".join([doc["content"] for doc in retrieved])
+system_msg = f"你是一个智能助手，请基于以下参考文档回答用户问题。如果文档中没有相关信息，请明确告知用户。\n\n参考文档：\n{context}"
+
+messages = [
+    {"role": "system", "content": system_msg},
+    {"role": "user", "content": user_question}
+]
+
+response = llm.invoke(messages)
+print(f"\n🤖 助手: {response.content}")

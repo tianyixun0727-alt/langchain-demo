@@ -11,15 +11,13 @@ from langchain_openai import ChatOpenAI #调用大模型
 def get_weather(city: str) -> str:
     """获取指定城市的天气信息"""
     return f"It's always sunny in {city}!"
-#把普通 Python 函数变成 LLM 可调用的工具,模拟了一个天气 API：输入城市名称 返回天气结果
 
 
 llm = ChatOpenAI(
     model="deepseek-v3",
     api_key="NbEJz6UO3LEL9uLngmohSK9iW8M2hNt8ZK5gn7MSq8trEplD",
     base_url="http://10.187.126.181:3000/v1"
-)#这一部分我们初始化了语言模型 ChatOpenAI。
-#虽然名字是 OpenAI，但其实支持任何兼容 OpenAI API 的模型，比如 DeepSeek。
+)
 
 agent = create_agent(
     model=llm,
